@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="./default.css"></link>
+</head>
+
+<body>
+    <div class="settings-bar">
+        <div class="settings-button"></div>
+    </div>
+    <div class="settings-panel">
+        <div class="settings-option">
+            <span>
+                Font size
+            </span>
+            <form>
+                <input value="22" type="number" min="8" max="50" id="settings-font-size" name="fontSize"/>
+            </form>
+            </div>
+        <div class="settings-option">
+            <span>
+                Background color
+            </span>
+            <input value="#272727" type="color" id="settings-bg"/>
+        </div>
+        <div class="settings-option settings-option-button" id="settings-default">
+            <span>
+                Reset to default
+            </span>
+        </div>
+        <div class="settings-option settings-option-accept-cookies settings-option-accept-cookies-text">
+            <span>
+                For persistent settings, you need to allow us to store options locally in your browser.
+            </span>
+        </div>
+        <div class="settings-option settings-option-button settings-option-accept-cookies" id="settings-local-storage">
+            <span>
+                Accept local storage
+            </span>
+        </div>
+    </div>
+    <!-- This is note -->
+    <textarea class="note" placeholder="Write stuff here"></textarea>
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="settings.js"></script>
+</body>
+
+</html>
