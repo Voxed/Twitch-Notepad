@@ -12,7 +12,7 @@
     const bgColor = document.querySelector("#settings-bg")
     const defaultOption = document.querySelector("#settings-default")
     const acceptCookies = document.querySelector(".settings-option-button.settings-option-accept-cookies")
-    var useCookies = localStorage.getItem("acceptedCookies") === "true";
+    let useCookies = localStorage.getItem("acceptedCookies") === "true";
 
     function enableCookies() {
         localStorage.setItem("acceptedCookies", "true");
@@ -28,7 +28,7 @@
         const b = parseInt(hex.substr(5, 2), 16)
         const flipYs = 0.342
         const trc = 2.4, Rco = 0.2126729, Gco = 0.7151522, Bco = 0.0721750
-        var Ys = (r / 255.0) ** trc * Rco + (g / 255.0) ** trc * Gco + (b / 255.0) ** trc * Bco
+        let Ys = (r / 255.0) ** trc * Rco + (g / 255.0) ** trc * Gco + (b / 255.0) ** trc * Bco
         return Ys < flipYs ? 'white' : 'black'
     }
 
@@ -38,8 +38,6 @@
         const fg = fgColor(color)
         note.style.color = fg
         bgColor.value = color
-        body.classList.add(fg + "-scroll")
-        body.classList.remove((fg === "white" ? "black" : "white") + "-scroll")
         if(useCookies)
             localStorage.setItem("backgroundColor", color)
     }

@@ -1,7 +1,7 @@
 {
     const note = document.querySelector(".note")
-    var prevRemovedCharCount = -1
-    var firstSync = true;
+    let prevRemovedCharCount = -1
+    let firstSync = true;
     window.Twitch.ext.listen("broadcast", (target, contentType, message) => {
         const payload = JSON.parse(message)
         const scrollLock = firstSync || note.scrollTop >= note.scrollHeight - note.offsetHeight - 10
