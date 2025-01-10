@@ -38,7 +38,7 @@
         const fg = fgColor(color)
         note.style.color = fg
         bgColor.value = color
-        if(useCookies)
+        if (useCookies)
             localStorage.setItem("backgroundColor", color)
     }
 
@@ -46,7 +46,7 @@
         size = size || defaultSettings.fontSize
         note.style.fontSize = size + "px"
         fontSize.value = size
-        if(useCookies)
+        if (useCookies)
             localStorage.setItem("fontSize", size)
     }
 
@@ -69,9 +69,18 @@
 
     defaultOption.addEventListener("click", resetDefaults)
 
-    if(!useCookies) {
+    if (!useCookies) {
         acceptCookies.addEventListener("click", enableCookies)
-    }else{
+    } else {
         enableCookies()
     }
+
+    // Prevent user from accidentally reloading extension by pressing enter 
+    // and submitting the form
+    settings.addEventListener("keypress", (e) => {
+        var key = e.charCode || e.keyCode || 0;
+        if (key == 13) {
+            e.preventDefault();
+        }
+    })
 }
