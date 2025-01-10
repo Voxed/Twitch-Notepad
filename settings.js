@@ -35,8 +35,11 @@
     function setBackgroundColor(color) {
         color = color || defaultSettings.backgroundColor
         body.style.backgroundColor = color;
-        note.style.color = fgColor(color)
+        const fg = fgColor(color)
+        note.style.color = fg
         bgColor.value = color
+        body.classList.add(fg + "-scroll")
+        body.classList.remove((fg === "white" ? "black" : "white") + "-scroll")
         if(useCookies)
             localStorage.setItem("backgroundColor", color)
     }

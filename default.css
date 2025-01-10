@@ -106,3 +106,16 @@ body {
     padding: 20px 20px 0px 20px;
     border-bottom: 10px solid transparent;
 }
+
+::-webkit-scrollbar {
+    width: 15px;
+}
+::-webkit-scrollbar-thumb {
+    cursor:default;
+}
+.black-scroll > *::-webkit-scrollbar-thumb {
+    background: black;
+}
+.white-scroll > *::-webkit-scrollbar-thumb {
+    background: white;
+}
