@@ -53,7 +53,7 @@
 
         emotes = {}
         {
-            let response = await getUserByConnection('TWITCH', '<TWITCH_CHANNEL_ID>')
+            let response = await getUserByConnection('TWITCH', '')
             for(set of response.emote_sets) {
                 for(emote of set.emotes) {
                     emotes[emote.name] = `https://cdn.7tv.app/emote/${emote.id}/1x.avif`
@@ -136,7 +136,7 @@
                         } else if (elem.nextSibling instanceof Image && elem.data.length > 0 && elem.data.slice(-1) !== ' ' && elem.data.slice(-1) !== '\n') {
                             elem.data = elem.data + elem.nextSibling.alt
                             elem.nextSibling.remove()
-                        } else if (elem.previousSibling instanceof Image && elem.data.length > 0 && elem.data[0] !== ' ' && elem.data[0] !== '\n') {
+                        } else if (elem.previousSibling instanceof Image && ((restOffset == 0 || rest == elem) || (elem.data.length > 0 && elem.data[0] !== ' ' && elem.data[0] !== '\n'))) {
                             if (rest == elem) {
                                 restOffset = restOffset + elem.previousSibling.alt.length
                             }
