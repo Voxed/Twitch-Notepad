@@ -53,9 +53,9 @@
 
         emotes = {}
         {
-            let response = await getUserByConnection('TWITCH', '')
-            for(set of response.emote_sets) {
-                for(emote of set.emotes) {
+            let response = await getUserByConnection('TWITCH', '<id>')
+            for (set of response.emote_sets) {
+                for (emote of set.emotes) {
                     emotes[emote.name] = `https://cdn.7tv.app/emote/${emote.id}/1x.avif`
                 }
             }
@@ -91,14 +91,22 @@
             })
         }
 
-        function onInput(e, paste = false) {
-            let shouldCreateEmotes = true
+        function onInput(e, paste = false, destroyEmote = false) {
+            /**
+             * This is the emote destruction code, (and text segment merging).
+             * It handles a lot of edgecases so it's pretty complex, but it's still very WIP, hopefully it gets better.
+             */
             {
                 const selection = window.getSelection();
                 const range = selection.getRangeAt(0);
                 let rest = range.startContainer
                 let restOffset = range.startOffset
 
+                /**
+                 * Sometimes the caret will oddly be located inbetween two elements.
+                 * If this is the case startContainer will be the note element.
+                 * In this case, move the selection to the next element and set the offset to 0.
+                 */
                 if (rest === note) {
                     rest = note.childNodes[restOffset]
                     restOffset = 0
@@ -114,30 +122,63 @@
                         break;
                     const elem = note.childNodes[i]
                     if (elem.tagName == "BR") {
+                        /**
+                         * Sometimes when pasting data, firefox (maybe others) stupidly inserts BR instead of \n
+                         * Let's destroy them
+                         */
                         if (elem === rest) {
-                            const text = new Text('')
+                            const text = new Text('\n')
                             rest = text
                             note.insertBefore(text, elem)
                         }
                         elem.remove()
+
                     } else if (elem.nextSibling != null && elem.nextSibling.tagName == "BR") {
+                        /**
+                         * If the BR is located to the right of a text element we wan't to destroy it before 
+                         * executing logic for the element.
+                         */
                         note.insertBefore(new Text('\n'), elem.nextSibling)
                         if (rest === elem.nextSibling.nextSibling)
                             rest = elem.nextSibling
                         elem.nextSibling.nextSibling.remove()
+
                     } else if (elem instanceof Text) {
+                        /**
+                         * The current element is a text
+                         */
                         if (elem.nextSibling instanceof Text) {
+                            /**
+                             * The next element is a text, merge the two elements
+                             */
                             if (rest == elem.nextSibling) {
                                 rest = elem
                                 restOffset = restOffset + elem.data.length
                             }
                             elem.data = elem.data + elem.nextSibling.data
                             elem.nextSibling.remove()
-                        } else if (elem.nextSibling instanceof Image && elem.data.length > 0 && elem.data.slice(-1) !== ' ' && elem.data.slice(-1) !== '\n') {
+
+                        } else if (elem.nextSibling instanceof Image &&
+                            elem.data.length > 0 && elem.data.slice(-1) !== ' ' && elem.data.slice(-1) !== '\n'
+                        ) {
+                            /**
+                             * The next element is an emote 
+                             * AND there is no space/newline before it
+                             */
                             elem.data = elem.data + elem.nextSibling.alt
                             elem.nextSibling.remove()
-                        } else if (elem.previousSibling instanceof Image && ((restOffset == 0 || rest == elem) || (elem.data.length > 0 && elem.data[0] !== ' ' && elem.data[0] !== '\n'))) {
-                            if (rest == elem) {
+
+                        } else if (elem.previousSibling instanceof Image && (
+                            (destroyEmote) ||
+                            (elem.data.length > 0 && elem.data[0] !== ' ' && elem.data[0] !== '\n')
+                        )) {
+                            /**
+                             * The previous element is an emote
+                             * AND there is no space/newline after it.
+                             * OR onInput has been fed the destroyEmote argument from beforeinput below
+                             */
+                            if (rest == elem || destroyEmote) {
+                                rest = elem
                                 restOffset = restOffset + elem.previousSibling.alt.length
                             }
                             elem.data = elem.previousSibling.alt + elem.data
@@ -146,14 +187,18 @@
                         } else {
                             i += 1
                         }
+
                     } else if (elem instanceof Image && elem.nextSibling instanceof Image) {
+                        /**
+                         * The current and the next element is an emote.
+                         * Two emotes are right next to eachother, destroy them both and create a merged text 
+                         */
                         const text = new Text(elem.alt + elem.nextSibling.alt)
                         note.insertBefore(text, elem)
                         if (elem.nextSibling == rest) {
                             rest = text
                             restOffset = elem.alt.length
                         }
-
                         elem.nextSibling.remove()
                         elem.remove()
                     } else {
@@ -167,6 +212,9 @@
                 window.getSelection().addRange(r)
             }
 
+            /**
+             * This is the emote creation code. It's relatively simple (relative in comparison to the destruction code lmao). (still WIP)
+             */
             {
                 const selection = window.getSelection();
                 const range = selection.getRangeAt(0);
@@ -213,8 +261,6 @@
                         }
                         emotesAdded = true
                     }
-
-                    // merge emotes text and text
                 }
 
                 window.getSelection().removeAllRanges()
@@ -223,20 +269,23 @@
                 r.setEnd(rest, restOffset)
                 window.getSelection().addRange(r)
             }
-
-            //console.log(text.substring(0, offset - 1).split(/[\n ]+/))
-            /*note.innerHTML = note.innerHTML.replace('aga', 'hey')
-             selection.removeAllRanges()
-             console.log(range)
-             const r2 = document.createRange();
-             console.log(start)
-             r2.setStart(note,1)
-             r2.setEnd(note,1);
-             console.log(r2)
-             window.getSelection().addRange(r2)*/
         }
 
         note.addEventListener("input", onInput)
+
+        note.addEventListener("beforeinput", (e) => {
+            if (e.inputType == 'deleteContentBackward') {
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                let rest = range.startContainer
+                let restOffset = range.startOffset
+                console.log(rest, restOffset)
+                if (restOffset == 0 || (rest == note && note.childNodes[restOffset - 1] instanceof Image)) {
+                    onInput(null, false, true)
+                    e.preventDefault()
+                }
+            }
+        })
 
         note.addEventListener('paste', function (e) {
             e.preventDefault()
@@ -257,7 +306,7 @@
             r.setEnd(node, node.data.length)
             window.getSelection().addRange(r)
 
-            onInput(null, true)
+            onInput(null, true, false)
 
             event.preventDefault();
 
