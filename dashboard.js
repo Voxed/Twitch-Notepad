@@ -119,6 +119,7 @@ query Users($userId: Id!) {
 
         emilya_channel_id = (await apiRequest('users?login=emilya')).data[0].id
         twemotes = (await apiRequest('chat/emotes?broadcaster_id=' + emilya_channel_id))
+        twglobalemotes = (await apiRequest('chat/emotes/global'))
         stvid = (await getUserByConnection('TWITCH', emilya_channel_id)).id
 
         stvemotes = await getUserActiveEmotes(stvid)
@@ -142,6 +143,9 @@ query Users($userId: Id!) {
                 console.log(emote)
             }
             for(emote of twemotes.data) {
+                emotes[emote.name] = {url: emote.images.url_4x, resolution: [32, 32]}
+            }
+            for(emote of twglobalemotes.data) {
                 emotes[emote.name] = {url: emote.images.url_4x, resolution: [32, 32]}
             }
         }
@@ -299,6 +303,10 @@ query Users($userId: Id!) {
                 window.getSelection().addRange(r)
             }
 
+            function escapeRegExp(text) {
+                return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+            }
+
             /**
              * This is the emote creation code. It's relatively simple (relative in comparison to the destruction code lmao). (still WIP)
              */
@@ -311,7 +319,7 @@ query Users($userId: Id!) {
                     let nextEmoteIndex = 999999999999999
                     let e = null
                     for (em in emotes) {
-                        let index = rest.data.search(`(?<=^|[\n ])${em}(?=[\n ]|$)`)
+                        let index = rest.data.search(`(?<=^|[\n ])${escapeRegExp(em)}(?=[\n ]|$)`)
                         if (index != -1) {
                             if (nextEmoteIndex > index) {
                                 nextEmoteIndex = index
