@@ -57,6 +57,7 @@ query Users($userId: Id!) {
         activeEmoteSet {
           emotes {
             items {
+              alias
               emote {
                 images {
                   height
@@ -141,7 +142,7 @@ query Users($userId: Id!) {
                         image = i.url
                     }
                 }
-                emotes[name] = {url: image, resolution}
+                emotes[emoteCont.alias] = {url: image, resolution}
             }
             for(emote of twemotes.data) {
                 emotes[emote.name] = {url: emote.images.url_4x, resolution: [32, 32]}
