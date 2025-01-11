@@ -104,4 +104,8 @@ body {
     box-sizing: border-box;
     font-size: 22px;
     padding: 20px;
+    white-space: pre;
+    text-wrap: wrap;
+    word-break: break-word;
+    margin: 0;
 }
