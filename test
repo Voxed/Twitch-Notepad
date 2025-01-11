@@ -1,0 +1,186 @@
+query OneEmote($id: Id!, $isDefaultSetSet: Boolean!, $defaultSetId: Id!) {
+  emotes {
+    emote(id: $id) {
+      id
+      defaultName
+      owner {
+        id
+        mainConnection {
+          platformDisplayName
+          platformAvatarUrl
+          __typename
+        }
+        style {
+          activeProfilePicture {
+            images {
+              url
+              mime
+              size
+              width
+              height
+              scale
+              frameCount
+              __typename
+            }
+            __typename
+          }
+          activePaint {
+            id
+            name
+            data {
+              layers {
+                id
+                ty {
+                  __typename
+                  ... on PaintLayerTypeSingleColor {
+                    color {
+                      hex
+                      __typename
+                    }
+                    __typename
+                  }
+                  ... on PaintLayerTypeLinearGradient {
+                    angle
+                    repeating
+                    stops {
+                      at
+                      color {
+                        hex
+                        __typename
+                      }
+                      __typename
+                    }
+                    __typename
+                  }
+                  ... on PaintLayerTypeRadialGradient {
+                    repeating
+                    stops {
+                      at
+                      color {
+                        hex
+                        __typename
+                      }
+                      __typename
+                    }
+                    shape
+                    __typename
+                  }
+                  ... on PaintLayerTypeImage {
+                    images {
+                      url
+                      mime
+                      size
+                      scale
+                      width
+                      height
+                      frameCount
+                      __typename
+                    }
+                    __typename
+                  }
+                }
+                opacity
+                __typename
+              }
+              shadows {
+                color {
+                  hex
+                  __typename
+                }
+                offsetX
+                offsetY
+                blur
+                __typename
+              }
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        highestRoleColor {
+          hex
+          __typename
+        }
+        editors {
+          editorId
+          permissions {
+            emote {
+              manage
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      tags
+      flags {
+        animated
+        approvedPersonal
+        defaultZeroWidth
+        deniedPersonal
+        nsfw
+        private
+        publicListed
+        __typename
+      }
+      attribution {
+        user {
+          mainConnection {
+            platformDisplayName
+            platformAvatarUrl
+            __typename
+          }
+          style {
+            activeProfilePicture {
+              images {
+                url
+                mime
+                size
+                width
+                height
+                scale
+                frameCount
+                __typename
+              }
+              __typename
+            }
+            __typename
+          }
+          highestRoleColor {
+            hex
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      imagesPending
+      images {
+        url
+        mime
+        size
+        width
+        height
+        scale
+        frameCount
+        __typename
+      }
+      ranking(ranking: TRENDING_WEEKLY)
+      inEmoteSets(emoteSetIds: [$defaultSetId]) @include(if: $isDefaultSetSet) {
+        emoteSetId
+        emote {
+          id
+          alias
+          __typename
+        }
+        __typename
+      }
+      deleted
+      __typename
+    }
+    __typename
+  }
+}

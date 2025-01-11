@@ -48,18 +48,105 @@
         }
     }
 
+    async function getUserActiveEmotes(userId) {
+        const query = `
+query Users($userId: Id!) {
+  users {
+    user(id: $userId) {
+      style {
+        activeEmoteSet {
+          emotes {
+            items {
+              emote {
+                images {
+                  height
+                  width
+                  url
+                  scale
+                  mime
+                  size
+                  frameCount
+                }
+                defaultName
+                flags {
+                  animated
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`;
 
-    (async (auth) => {
+        const variables = { userId };
+
+        try {
+            const response = await fetch('https://7tv.io/v4/gql', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query, variables }),
+            });
+
+            const json = await response.json();
+            if (json.errors) {
+                console.error('7TV GraphQL errors:', json.errors);
+                return null;
+            }
+
+            // If user wasn't found, userByConnection could be null
+            return json.data.users.user.style.activeEmoteSet.emotes.items;
+        } catch (err) {
+            console.error('Network/Fetch error:', err);
+            return null;
+        }
+    }
+
+
+    window.Twitch.ext.onAuthorized(async (auth) => {
+
+        console.log({ 'Content-Type': 'application/json', 'client-id': auth.clientId, 'Authorization': 'Extension ' + auth.helixToken})
+
+
+        async function apiRequest(endpoint){
+            const response = await fetch('https://api.twitch.tv/helix/' + endpoint, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', 'client-id': auth.clientId, 'Authorization': 'Extension ' + auth.helixToken}
+            });
+            return await response.json()
+        }
+
+        emilya_channel_id = (await apiRequest('users?login=emilya')).data[0].id
+        twemotes = (await apiRequest('chat/emotes?broadcaster_id=' + emilya_channel_id))
+        stvid = (await getUserByConnection('TWITCH', emilya_channel_id)).id
+
+        stvemotes = await getUserActiveEmotes(stvid)
+
 
         emotes = {}
         {
-            let response = await getUserByConnection('TWITCH', '')
-            for (set of response.emote_sets) {
-                for (emote of set.emotes) {
-                    emotes[emote.name] = `https://cdn.7tv.app/emote/${emote.id}/1x.avif`
+            for (emoteCont of stvemotes) {
+                const emote = emoteCont.emote
+                const name = emote.defaultName
+                const images = emote.images
+                let image = images[0].url
+                let resolution = []
+                for(i of images) {
+                    if(i.scale == 4 && i.mime == "image/avif" && (!emote.flags.animated || i.frameCount > 1 )) {
+                        resolution = [i.width, i.height]
+                        image = i.url
+                    }
                 }
+                emotes[name] = {url: image, resolution}
+                console.log(emote)
+            }
+            for(emote of twemotes.data) {
+                emotes[emote.name] = {url: emote.images.url_4x, resolution: [32, 32]}
             }
         }
+
+        console.log(emotes)
 
         let note = document.querySelector(".note");
         setInterval(() => {
@@ -238,9 +325,12 @@
                         let newOffset = restOffset - (nextEmoteIndex + e.length)
                         let emote = new Text(e)
                         if (newOffset != 0) {
-                            emote = new Image(32, 32)
+                            em = emotes[e]
+                            width = (em.resolution[0]/em.resolution[1])*32
+                            emote = new Image(width, 32)
+                            emote.classList.add('emote')
                             emote.alt = e
-                            emote.src = emotes[e]
+                            emote.src = em.url
                         } else {
                             break
                         }
@@ -317,5 +407,5 @@
             e.dataTransfer.clearData()
             e.dataTransfer.setData('text', plainText)
         });
-    })()
+    })
 }
