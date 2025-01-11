@@ -267,7 +267,7 @@ query Users($userId: Id!) {
                             elem.nextSibling.remove()
 
                         } else if (elem.previousSibling instanceof Image && (
-                            (destroyEmote) ||
+                            (destroyEmote && elem == rest && restOffset == 0) ||
                             (elem.data.length > 0 && elem.data[0] !== ' ' && elem.data[0] !== '\n')
                         )) {
                             /**
@@ -339,7 +339,7 @@ query Users($userId: Id!) {
                         const newRest = new Text(rest.data.substring(nextEmoteIndex + e.length))
                         let newOffset = restOffset - (nextEmoteIndex + e.length)
                         let emote = new Text(e)
-                        if (newOffset != 0) {
+                        if (newOffset > 0 || newOffset <= -e.length) {
                             em = emotes[e]
                             const ratio = (em.resolution[0]/em.resolution[1])
                             emote = new Image(ratio*window.notepadSettings.fontSize, window.notepadSettings.fontSize)
