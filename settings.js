@@ -1,3 +1,7 @@
+window.notepadSettings = {
+    fontSize: 22
+}
+
 {
     const defaultSettings = {
         "fontSize": 22,
@@ -46,6 +50,11 @@
         size = size || defaultSettings.fontSize
         note.style.fontSize = size + "px"
         fontSize.value = size
+        document.querySelectorAll('.emote').forEach(e => {
+            e.height = size
+            e.width = size * parseFloat(e.dataset.ratio)
+        })
+        window.notepadSettings.fontSize = size
         if (useCookies)
             localStorage.setItem("fontSize", size)
     }

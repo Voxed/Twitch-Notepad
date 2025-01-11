@@ -334,8 +334,9 @@ query Users($userId: Id!) {
                         let emote = new Text(e)
                         if (newOffset != 0) {
                             em = emotes[e]
-                            width = (em.resolution[0]/em.resolution[1])*32
-                            emote = new Image(width, 32)
+                            const ratio = (em.resolution[0]/em.resolution[1])
+                            emote = new Image(ratio*window.notepadSettings.fontSize, window.notepadSettings.fontSize)
+                            emote.dataset.ratio = ratio
                             emote.classList.add('emote')
                             emote.alt = e
                             emote.src = em.url
