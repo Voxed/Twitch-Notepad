@@ -124,6 +124,8 @@ query Users($userId: Id!) {
 
         stvemotes = await getUserActiveEmotes(stvid)
 
+        bttvemotes = await (await fetch("https://api.betterttv.net/3/cached/emotes/global")).json()
+        console.log('bttv', bttvemotes)
 
         emotes = {}
         {
@@ -140,17 +142,21 @@ query Users($userId: Id!) {
                     }
                 }
                 emotes[name] = {url: image, resolution}
-                console.log(emote)
             }
             for(emote of twemotes.data) {
                 emotes[emote.name] = {url: emote.images.url_4x, resolution: [32, 32]}
             }
             for(emote of twglobalemotes.data) {
-                emotes[emote.name] = {url: emote.images.url_4x, resolution: [32, 32]}
+                // disable smilies because they are non-standard size and will look weird
+                if(!['R)', ';P', ':P', ';)', ':/', '<3', ':O', 'B)', 'O_o', ':|', '>(', ':D', ':(', ':)'].includes(emote.name))
+                    emotes[emote.name] = {url: emote.images.url_4x, resolution: [32, 32]}
+            }
+            for(emote of bttvemotes) {
+                // some are non standard size but they don't list it so nothing i can do about that
+                emotes[emote.code] = {url: `https://cdn.betterttv.net/emote/${emote.id}/3x.webp`, resolution: [32, 32]}
             }
         }
 
-        console.log(emotes)
 
         let note = document.querySelector(".note");
         setInterval(() => {
