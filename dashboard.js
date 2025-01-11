@@ -172,22 +172,27 @@ query Users($userId: Id!) {
         // This is a code hack which ensures that there is a padding underneath the caret when
         // moving it initiates a scroll. That's how it works in notepad
         // Tested on Firefox and Chrome
-        {
+/*         {
             const scrollPadding = 20
             let selectionTimeout = 0
             let oldSelection = 0
-            note.addEventListener("scroll", (e) => {
-                if (note.selectionStart != oldSelection)
-                    note.scrollTop += scrollPadding * Math.sign(note.selectionStart - oldSelection)
-                oldSelection = note.selectionStart
+            let selection = 0
+            note.addEventListener("scrollbegin", (e) => {
+                console.log(selection, oldSelection)
+                if (selection != oldSelection) {
+                    note.scrollTop += scrollPadding
+                    console.log("scroll")
+                }
+                oldSelection = selection
             })
-            note.addEventListener("selectionchange", (e) => {
+            document.addEventListener("selectionchange", (e) => {
                 clearTimeout(selectionTimeout)
+                selection += 1
                 selectionTimeout = setTimeout(() => {
-                    oldSelection = note.selectionStart
+                    oldSelection = selection
                 }, 100)
             })
-        }
+        } */
 
         function onInput(e, paste = false, destroyEmote = false) {
             /**

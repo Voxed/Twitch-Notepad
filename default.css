@@ -108,6 +108,7 @@ body {
     text-wrap: wrap;
     word-break: break-word;
     margin: 0;
+    overflow: scroll
 }
 
 .emote {
