@@ -53,7 +53,7 @@
 
         emotes = {}
         {
-            let response = await getUserByConnection('TWITCH', '<id>')
+            let response = await getUserByConnection('TWITCH', '')
             for (set of response.emote_sets) {
                 for (emote of set.emotes) {
                     emotes[emote.name] = `https://cdn.7tv.app/emote/${emote.id}/1x.avif`
@@ -279,8 +279,8 @@
                 const range = selection.getRangeAt(0);
                 let rest = range.startContainer
                 let restOffset = range.startOffset
-                console.log(rest, restOffset)
-                if (restOffset == 0 || (rest == note && note.childNodes[restOffset - 1] instanceof Image)) {
+                let multiSelect = range.startContainer != range.endContainer || range.startOffset != range.endOffset
+                if (!multiSelect && (restOffset == 0 || (rest == note && note.childNodes[restOffset - 1] instanceof Image))) {
                     onInput(null, false, true)
                     e.preventDefault()
                 }
