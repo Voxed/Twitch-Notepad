@@ -107,6 +107,8 @@ query Users($userId: Id!) {
 
     window.Twitch.ext.onAuthorized(async (auth) => {
 
+        console.log(auth.clientId)
+
         console.log({ 'Content-Type': 'application/json', 'client-id': auth.clientId, 'Authorization': 'Extension ' + auth.helixToken})
 
 
@@ -161,11 +163,11 @@ query Users($userId: Id!) {
 
         let note = document.querySelector(".note");
         setInterval(() => {
-            //let charCount = note.value.length
-            /*window.Twitch.ext.send("broadcast", "application/json", JSON.stringify({
+            let charCount = note.textContent.length
+            window.Twitch.ext.send("broadcast", "application/json", JSON.stringify({
                 "charCount": charCount,
-                "note": note.value.slice(-4000)
-            }))*/
+                "note": note.textContent.slice(-4000)
+            }))
         }, 1000) // This value MUST be more than 60000 / 100 = 600 otherwise you will get rate 
         // limited
 

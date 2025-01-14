@@ -1,0 +1,45 @@
+{
+  "name": "twitch-notepad",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "generate": "graphql-codegen"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.12.5",
+    "@mantine/core": "^7.15.3",
+    "@mantine/hooks": "^7.15.3",
+    "@mantine/tiptap": "^7.15.3",
+    "@tabler/icons-react": "^3.28.1",
+    "@tiptap/extension-link": "^2.11.2",
+    "@tiptap/pm": "^2.11.2",
+    "@tiptap/react": "^2.11.2",
+    "@tiptap/starter-kit": "^2.11.2",
+    "@types/twitch-ext": "^1.24.9",
+    "@uiw/react-codemirror": "^4.23.7",
+    "graphql": "^16.10.0",
+    "next": "15.1.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@graphql-codegen/cli": "^5.0.3",
+    "@graphql-codegen/client-preset": "^4.5.1",
+    "@graphql-codegen/typescript": "^4.1.2",
+    "@graphql-codegen/typescript-operations": "^4.4.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.4",
+    "postcss": "^8.4.49",
+    "postcss-preset-mantine": "^1.17.0",
+    "postcss-simple-vars": "^7.0.1",
+    "typescript": "^5"
+  }
+}
