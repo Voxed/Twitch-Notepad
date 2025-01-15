@@ -76,9 +76,9 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
 
     // Notify parent node when ready
     useEffect(() => {
-        if (emoteHelperReady)
+        if (emoteHelperReady && !firstSync)
             setReady(true)
-    }, [emoteHelperReady, setReady])
+    }, [emoteHelperReady, setReady, firstSync])
 
     useEffect(() => {
         setContentRef.current = (content: string, charCount: number) => {
