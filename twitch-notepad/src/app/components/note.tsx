@@ -50,7 +50,7 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                 const oldScroll = editorRef.current.view.scrollSnapshot()
                 const oldSelection = editorRef.current.view.state.selection
 
-                if(editorRef.current.view.state.doc.length == 0)
+                if(editorRef.current.view.state.doc.length == 0 || insertAt < startsAt)
                     setStartsAt(insertAt)
 
                 // This code inserts lines of 79 spaces until we reach the required document length. This is for when the user misses content, most likely because the streamer spammed the editor.

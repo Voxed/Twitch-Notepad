@@ -40,12 +40,3 @@ a {
     color-scheme: dark;
   }
 }
-
-.tiptap {
-  flex-grow: 1;
-  height: 0;
-  overflow: auto;
-}
-.tiptap p {
-  margin: 0;
-}
