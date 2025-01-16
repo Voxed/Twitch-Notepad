@@ -23,7 +23,7 @@ interface NoteProps {
 export default function Note({ fontSize = "22px", backgroundColor = "#272727", color = "white", twitchAuth, setReady, enableEmotes, readonly, setContentRef, onChange, getContentRef }: NoteProps) {
     const editorRef = useRef<ReactCodeMirrorRef>({})
     const [emoteHelperReady, setEmoteHelperReady] = useState(false)
-    const [emoteHelper] = useState(new EmoteHelper(twitchAuth, "emilya", true, setEmoteHelperReady))
+    const [emoteHelper] = useState(new EmoteHelper(twitchAuth, undefined, false, setEmoteHelperReady))
     const [firstSync, setFirstSync] = useState(true)
     const [startsAt, setStartsAt] = useState(0)
 

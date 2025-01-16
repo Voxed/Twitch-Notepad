@@ -21,6 +21,7 @@
     "@tiptap/starter-kit": "^2.11.2",
     "@types/twitch-ext": "^1.24.9",
     "@uiw/react-codemirror": "^4.23.7",
+    "glob": "^11.0.1",
     "graphql": "^16.10.0",
     "next": "15.1.4",
     "react": "^19.0.0",
