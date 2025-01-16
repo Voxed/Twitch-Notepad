@@ -5,7 +5,7 @@ function oldLineDecoration(view: EditorView) {
     for (const {from, to} of view.visibleRanges) {
       for (let pos = from; pos <= to;) {
         const line = view.state.doc.lineAt(pos)
-        if(line.from < view.state.doc.length - 4000)
+        if(line.from < view.state.doc.length - 3900)
             builder.add(line.from, line.from, Decoration.line({
                 attributes: { class: "cm-oldLine" }
             }))
