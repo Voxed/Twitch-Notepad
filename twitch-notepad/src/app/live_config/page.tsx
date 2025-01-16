@@ -15,7 +15,7 @@ export default function LiveConfig() {
         // also do not send the message if our msg/m >= 90. Hard block to ensure we do not reach 100 msg/m.
         if(((messageTimeStamps.length === 0 || messageTimeStamps.slice(-1)[0] < Date.now() - 1000) || changed) && messagePerMinute < 90) {
             setMessageTimeStamps(messageTimeStamps.filter(n => n > Date.now() - 60000).concat([Date.now()]))
-            window.Twitch.ext.send("broadcast", "application/json", JSON.stringify({charCount: (content.match(/\n/g) || []).length + 1, content: content.slice(-4000)}))
+            window.Twitch.ext.send("broadcast", "application/json", JSON.stringify({insertAt: Math.max(0, content.length - 4000), content: content.slice(-4000)}))
             setChanged(false)
         } else {
             setMessageTimeStamps(messageTimeStamps.filter(n => n > Date.now() - 60000))

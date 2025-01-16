@@ -8,7 +8,7 @@ import Note from "./note";
 
 interface AppProps{
     readonly: boolean,
-    setContentRef: RefObject<(content: string, charCount: number) => void>,
+    setContentRef: RefObject<(content: string, insertAt: number) => void>,
     onChange: (content: string) => void,
     getContentRef: RefObject<() => string>
 }

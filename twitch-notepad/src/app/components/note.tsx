@@ -1,9 +1,10 @@
-import CodeMirror, { EditorState, EditorView, Prec, ReactCodeMirrorRef, TransactionSpec } from '@uiw/react-codemirror';
+import CodeMirror, { EditorSelection, EditorState, EditorView, Prec, ReactCodeMirrorRef, TransactionSpec } from '@uiw/react-codemirror';
 import { insertNewline, insertTab } from '@codemirror/commands';
 import { keymap } from "@codemirror/view"
 import { EmoteHelper } from "./EmoteHelper"
 import { emotePlugin } from "./EmoteCodeMirrorExtension";
 import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
+import { oldLines } from './OldLineCodeMirrorExtension';
 
 interface NoteProps {
     fontSize: string,
@@ -20,55 +21,11 @@ interface NoteProps {
 }
 
 export default function Note({ fontSize = "22px", backgroundColor = "#272727", color = "white", twitchAuth, setReady, enableEmotes, readonly, setContentRef, onChange, getContentRef }: NoteProps) {
-    // voice shit for future
-    /*useEffect(() => {
-        setInterval(() => {
-            /*if (stre.current?.view && stre.current?.state) {
-                
-                
-                const insertionPoint = stre.current.view.state.doc.toString().split('\n').slice(0, -1).join('\n').length
-                
-                
-                const endOfLine = stre.current.view.state.selection.main.anchor === insertionPoint + "&newStuff&".length
-                const offset = stre.current.view.state.doc.toString().indexOf(" &newStuff&") === -1 ? " &newStuff&".length : stre.current.view.state.doc.toString().indexOf(" &newStuff&") + " &newStuff&".length
-                
-
-                speechSynthesis.cancel()
-                const utterance = new SpeechSynthesisUtterance(stre.current.view.state.doc.sliceString(offset, insertionPoint))
-                utterance.voice = speechSynthesis.getVoices()[12]
-                speechSynthesis.speak(utterance)
-                
-
-                stre.current.view.dispatch(
-                {
-                    changes: {
-                        from: insertionPoint,
-                        to: insertionPoint,
-                        insert: " &newStuff&"
-                    },
-                    selection: {
-                        anchor: endOfLine ? insertionPoint + " &newStuff&".length : stre.current.view.state.selection.main.anchor + " &newStuff&".length,
-                        head: stre.current.view.state.selection.main.head + " &newStuff&".length
-                    },
-                    filter: false
-                },
-                stre.current.view.state.doc.toString().indexOf("&newStuff&") !== -1 ? {
-                    changes: {
-                        from: stre.current.view.state.doc.toString().indexOf(" &newStuff&"),
-                        to: stre.current.view.state.doc.toString().indexOf(" &newStuff&") + 11,
-                        insert: ""
-                    },
-                    filter: false
-                } : {})
-            }*/
-    /*}, 5000)
-    }, [])*/
-
     const editorRef = useRef<ReactCodeMirrorRef>({})
     const [emoteHelperReady, setEmoteHelperReady] = useState(false)
     const [emoteHelper] = useState(new EmoteHelper(twitchAuth, "emilya", true, setEmoteHelperReady))
     const [firstSync, setFirstSync] = useState(true)
-    const [prevLineDelta, setPrevLineDelta] = useState(0)
+    const [startsAt, setStartsAt] = useState(0)
 
     useEffect(() => {
         emoteHelper.init()
@@ -76,50 +33,61 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
 
     // Notify parent node when ready
     useEffect(() => {
-        if (emoteHelperReady && !firstSync)
+        if (emoteHelperReady && (!readonly || !firstSync))
             setReady(true)
-    }, [emoteHelperReady, setReady, firstSync])
+    }, [emoteHelperReady, setReady, firstSync, readonly])
 
     useEffect(() => {
-        setContentRef.current = (content: string, charCount: number) => {
+        setContentRef.current = (content: string, insertAt: number) => {
+            console.log(content, insertAt)
+
             if (editorRef.current.view) {
                 let scrollLock: boolean = false;
                 if (editorRef.current.view?.scrollDOM)
                     if (editorRef.current.view.scrollDOM.scrollTop >= editorRef.current.view.scrollDOM.scrollHeight - editorRef.current.view.scrollDOM.offsetHeight - 10)
                         scrollLock = true
 
-                const lineDelta = charCount - ((content.match(/\n/g) || []).length + 1)
-                const linesToAdd = lineDelta - prevLineDelta
                 const oldScroll = editorRef.current.view.scrollSnapshot()
+                const oldSelection = editorRef.current.view.state.selection
+
+                if(editorRef.current.view.state.doc.length == 0)
+                    setStartsAt(insertAt)
+
+                // This code inserts lines of 79 spaces until we reach the required document length. This is for when the user misses content, most likely because the streamer spammed the editor.
+                if(insertAt - startsAt > editorRef.current.view.state.doc.length){
+                    editorRef.current.view?.dispatch({
+                        changes: [
+                            {
+                                from: editorRef.current.view.state.doc.length ,
+                                insert: (" ".repeat(insertAt - startsAt - editorRef.current.view.state.doc.length).match(/.{1,80}/g) || ["impossible"]).concat([" "]).map(e => e.slice(0, -1)).join('\n')
+                            }],
+                        filter: false,
+                        selection: editorRef.current.view.state.selection,
+                    } as TransactionSpec)
+                }
 
                 editorRef.current.view?.dispatch({
                     changes: [
                         {
-                            from: 0,
-                            to: linesToAdd > 0 ? 0 : -linesToAdd,
-                            insert: linesToAdd > 0 ? "\n".repeat(linesToAdd) : ''
-                        },
-                        {
-                            from: prevLineDelta,
-                            to: editorRef.current.view.state.doc.length,
+                            from: insertAt - startsAt,
+                            to: Math.max(insertAt - startsAt, editorRef.current.view.state.doc.length),
                             insert: content
                         }],
                     filter: false,
-                    selection: editorRef.current.view.state.selection
                 } as TransactionSpec)
 
                 editorRef.current.view?.dispatch({
                     effects: [
                         !scrollLock && !firstSync ? oldScroll : EditorView.scrollIntoView(99999999999999)
                     ],
+                    selection: oldSelection.main.to < editorRef.current.view.state.doc.length ? oldSelection.asSingle() : EditorSelection.single(0),
                 } as TransactionSpec)
                 
-                setPrevLineDelta(lineDelta)
                 setFirstSync(false)
             }
         }
         getContentRef.current = () => editorRef.current.view?.state.doc.toString() || ""
-    }, [getContentRef, setContentRef, firstSync, prevLineDelta])
+    }, [getContentRef, setContentRef, firstSync, startsAt])
 
     return (!emoteHelperReady ? <></> : <CodeMirror height="calc(100vh - var(--app-shell-header-height, 0px))"
         theme={
@@ -127,9 +95,17 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                 "&": {
                     color,
                     backgroundColor,
-                    padding: "10px",
+                    //padding: "10px",
                     fontSize,
                     fontFamily: "Consolas, monospace"
+                },
+                ".cm-content": {
+                    paddingBottom: '10px',
+                    paddingTop: '10px'
+                },
+                '.cm-line': {
+                    paddingLeft: '10px',
+                    paddingRight: '10px'
                 },
                 "&.cm-focused .cm-cursor": {
                     borderLeftColor: color
@@ -142,6 +118,10 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                 },
                 '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection':
                     { backgroundColor: "#0078d7" },
+                '.cm-oldLine':
+                    { 
+                        opacity: '0.5'
+                     },
             })
         }
         extensions={
@@ -166,7 +146,18 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                         },
                     ]
                 )),
-                EditorState.readOnly.of(readonly)
+                EditorState.readOnly.of(readonly),
+                EditorView.scrollMargins.of(() => ({top: 10, bottom: 10})),
+                EditorState.changeFilter.of((tr) => {
+                    let good = true
+                    tr.changes.iterChangedRanges((_1, _2, from2) => {
+                        if(from2 < tr.newDoc.length - 3900) {
+                            good = false
+                        }
+                    })
+                    return good
+                }),
+                oldLines()
             ]
         }
         basicSetup={
@@ -175,10 +166,14 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                 searchKeymap: false,
                 bracketMatching: false,
                 closeBrackets: false,
-                indentOnInput: false
+                indentOnInput: false,
+                lineNumbers: false,
+                foldGutter: false
             }
         }
-        onChange={onChange}
+        onChange={(v) => {
+            onChange(v)
+        }}
         ref={editorRef}>
     </CodeMirror>
     )
