@@ -10,3 +10,9 @@ A shared notepad between you and your Twitch viewers.
 ```
 npm run build
 ```
+
+## GraphQL types
+To regenerate GraphQL types for 7TV run
+```
+npm run generate
+```
