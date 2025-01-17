@@ -6,14 +6,14 @@ import { RefObject, useEffect, useState } from "react"
 import { IconAdjustments, IconAppWindow } from '@tabler/icons-react';
 import Note from "./note";
 
-interface AppProps{
+interface AppProps {
     readonly: boolean,
     setContentRef: RefObject<(content: string, insertAt: number) => void>,
     onChange: (content: string) => void,
     getContentRef: RefObject<() => string>
 }
 
-export default function App({readonly, getContentRef, onChange, setContentRef}: AppProps) {
+export default function App({ readonly, getContentRef, onChange, setContentRef }: AppProps) {
     const [backgroundColor, setBackgroundColor] = useState("#272727");
     const [fontSize, setFontSize] = useState<string | number>(22);
     const [foregroundColor, setForegroundColor] = useState("white")
@@ -43,7 +43,7 @@ export default function App({readonly, getContentRef, onChange, setContentRef}: 
     const [acknowledged, setAcknowledged] = useState(false);
 
     useEffect(() => {
-        if(acknowledged) {
+        if (acknowledged) {
             localStorage.setItem("notepadBackgroundColor", backgroundColor)
             localStorage.setItem("notepadAcknowledged", String(acknowledged))
             localStorage.setItem("notepadFontSize", String(fontSize))
@@ -53,11 +53,11 @@ export default function App({readonly, getContentRef, onChange, setContentRef}: 
     }, [enableEmotes, acknowledged, fontSize, backgroundColor])
 
     useEffect(() => {
-        setBackgroundColor(localStorage.getItem('notepadBackgroundColor')  || "#272727")
+        setBackgroundColor(localStorage.getItem('notepadBackgroundColor') || "#272727")
         setFontSize(Number(localStorage.getItem('notepadFontSize')) || 22)
         setEnableEmotes(!(localStorage.getItem('notepadEnableEmotes') !== undefined && localStorage.getItem('notepadEnableEmotes') === "false"))
         setAcknowledged((localStorage.getItem('notepadAcknowledged') !== undefined && localStorage.getItem('notepadAcknowledged') === "true"))
-      }, []);
+    }, []);
 
     return (
         <>
@@ -76,7 +76,10 @@ export default function App({readonly, getContentRef, onChange, setContentRef}: 
                         direction="column"
                         gap="md"
                     >
-                        <Paper style={{ backgroundColor, color: foregroundColor, fontFamily: 'Consolas', fontSize, overflow: 'hidden' }} p="md" h={100} withBorder>
+                        <Paper style={{
+                            backgroundColor, color: foregroundColor, fontFamily: 'Consolas', fontSize, overflow: 'hidden',
+                            transition: "font-size 0.1s, background-color 0.1s"
+                        }} p="md" h={100} withBorder>
                             This is a preview of your notepad
                         </Paper>
                         <ColorInput
@@ -89,7 +92,7 @@ export default function App({readonly, getContentRef, onChange, setContentRef}: 
                             min={8}
                             max={50}
                             defaultValue={fontSize}
-                            onChange={setFontSize}
+                            onChange={v => setFontSize(Math.max(8, Math.min(50, Number(v))))}
                         >
                         </NumberInput>
                         <Center>

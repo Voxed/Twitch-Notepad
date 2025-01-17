@@ -97,7 +97,8 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                     backgroundColor,
                     //padding: "10px",
                     fontSize,
-                    fontFamily: "Consolas, monospace"
+                    fontFamily: "Consolas, monospace",
+                    transition: "font-size 0.1s, background-color 0.1s"
                 },
                 ".cm-content": {
                     paddingBottom: '10px',
@@ -122,6 +123,13 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                     { 
                         opacity: '0.5'
                      },
+                '.cm-emote':
+                     {
+                        display: 'inline-block',
+                        width: 'auto',
+                        height: fontSize,
+                        transition: "height 0.1s"
+                     }
             })
         }
         extensions={

@@ -19,18 +19,21 @@ class EmoteWidget extends WidgetType {
         })
         const height = maxHeight === 999999 ? minHeight : maxHeight
         const image = this.emote.images.filter(i => i.height === height)[0]
-        const wrap = document.createElement("span")
-        const box = wrap.appendChild<HTMLImageElement>(new Image())
+        const box = new Image()
+        box.classList.add("cm-emote")
         box.src = image.url
         box.style.verticalAlign = 'middle'
-        box.style.marginBottom = "-10px"
-        box.style.marginTop = "-16px"
-        box.height = this.lineHeight
-        return wrap
+        box.style.marginBottom = "auto"
+        box.style.marginTop = "auto"
+        box.height = this.emote.images[0].height
+        box.width = this.emote.images[0].width
+        return box
     }
 
     ignoreEvent() { return false }
 }
+
+//<span contenteditable="false"><img class="cm-emote" src="https://static-cdn.jtvnw.net/emoticons/v2/1/static/light/3.0" height="63" width="84" style="vertical-align: middle; margin-bottom: -10px; margin-top: -16px;"></span>
 
 const emoteMatcher = (emoteHelper: EmoteHelper) => new MatchDecorator({
     regexp: new RegExp(emoteHelper.getRegExp(), 'g'),
