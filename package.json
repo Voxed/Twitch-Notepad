@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && node --no-warnings scripts/make-twitch-complient.ts && node --no-warnings scripts/zip-extension.ts",
     "start": "next start",
     "lint": "next lint",
     "generate": "graphql-codegen"
   },
+  "type": "module",
   "dependencies": {
     "@apollo/client": "^3.12.5",
     "@mantine/core": "^7.15.3",
@@ -21,6 +22,7 @@
     "@tiptap/starter-kit": "^2.11.2",
     "@types/twitch-ext": "^1.24.9",
     "@uiw/react-codemirror": "^4.23.7",
+    "archiver": "^7.0.1",
     "glob": "^11.0.1",
     "graphql": "^16.10.0",
     "next": "15.1.4",
@@ -33,6 +35,7 @@
     "@graphql-codegen/client-preset": "^4.5.1",
     "@graphql-codegen/typescript": "^4.1.2",
     "@graphql-codegen/typescript-operations": "^4.4.0",
+    "@types/archiver": "^6.0.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
