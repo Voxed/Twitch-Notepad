@@ -63,7 +63,7 @@ export default function App({readonly, getContentRef, onChange, setContentRef}: 
         <>
             {!acknowledged ?
                 <Modal title="Acknowledgment" opened={preferences} onClose={closePreferences}>
-                    <Center>In access adjust preferences you need to allow us to store their value in your browsers local storage. </Center>
+                    <Center>In order to adjust local preferences you need to allow us to store their value in your browsers local storage. </Center>
                     <Space h="md"></Space>
                     <Center><Button onClick={() => {
                         setAcknowledged(true)
