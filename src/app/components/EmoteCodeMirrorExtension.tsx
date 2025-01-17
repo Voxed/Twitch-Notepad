@@ -1,6 +1,11 @@
 
+import { Facet } from "@uiw/react-codemirror"
 import { EmoteHelper, Emote } from "./EmoteHelper"
 import { ViewUpdate, ViewPlugin, DecorationSet, WidgetType, MatchDecorator, Decoration, EditorView } from "@codemirror/view"
+
+export const emoteHeight = Facet.define<number, number>({
+    combine: values => values[0]
+})
 
 class EmoteWidget extends WidgetType {
     constructor(readonly emote: Emote, readonly lineHeight: number) {
@@ -19,13 +24,12 @@ class EmoteWidget extends WidgetType {
         })
         const height = maxHeight === 999999 ? minHeight : maxHeight
         const image = this.emote.images.filter(i => i.height === height)[0]
-        const wrap = document.createElement("span")
         const box = new Image()
         box.classList.add("cm-emote")
         box.src = image.url
         box.style.verticalAlign = 'middle'
-        box.style.marginBottom = "auto"
-        box.style.marginTop = "auto"
+        box.style.marginBottom = "-100px"
+        box.style.marginTop = "-100px"
         box.height = this.emote.images[0].height
         box.width = this.emote.images[0].width
         return box
@@ -42,7 +46,7 @@ const emoteMatcher = (emoteHelper: EmoteHelper) => new MatchDecorator({
         return Decoration.replace({
             widget: new EmoteWidget(
                 emoteHelper.getEmote(match[0]),
-                view.defaultLineHeight
+                view.state.facet(emoteHeight)
             ),
         });
     },

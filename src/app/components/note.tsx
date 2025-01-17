@@ -2,7 +2,7 @@ import CodeMirror, { EditorSelection, EditorState, EditorView, Prec, ReactCodeMi
 import { insertNewline, insertTab } from '@codemirror/commands';
 import { keymap } from "@codemirror/view"
 import { EmoteHelper } from "./EmoteHelper"
-import { emotePlugin } from "./EmoteCodeMirrorExtension";
+import { emoteHeight, emotePlugin } from "./EmoteCodeMirrorExtension";
 import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
 import { oldLines } from './OldLineCodeMirrorExtension';
 
@@ -26,6 +26,7 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
     const [emoteHelper] = useState(new EmoteHelper(twitchAuth, undefined, false, setEmoteHelperReady))
     const [firstSync, setFirstSync] = useState(true)
     const [startsAt, setStartsAt] = useState(0)
+    const [emoteMultiplier] = useState(1.5) // Multiply the height of emotes by this
 
     useEffect(() => {
         emoteHelper.init()
@@ -127,14 +128,15 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
                      {
                         display: 'inline-block',
                         width: 'auto',
-                        height: fontSize,
+                        height: (Number(fontSize.slice(0,-2)) * emoteMultiplier) + 'px',
                         transition: "height 0.1s"
-                     }
+                     },
             })
         }
         extensions={
             [
-                enableEmotes ? emotePlugin(emoteHelper) : [],
+
+                enableEmotes ? [emoteHeight.of(Number(fontSize.slice(0,-2)) * emoteMultiplier), emotePlugin(emoteHelper)] : [],
                 EditorView.lineWrapping,
                 Prec.highest(keymap.of(
                     [
