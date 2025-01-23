@@ -40,8 +40,6 @@ export default function Note({ fontSize = "22px", backgroundColor = "#272727", c
 
     useEffect(() => {
         setContentRef.current = (content: string, insertAt: number) => {
-            console.log(content, insertAt)
-
             if (editorRef.current.view) {
                 let scrollLock: boolean = false;
                 if (editorRef.current.view?.scrollDOM)
